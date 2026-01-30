@@ -1,0 +1,16 @@
+---
+title: "Titanic"
+author: "Khandker Qaiduzzaman"
+format: html
+editor: visual
+---
+
+# Approach
+
+## Exploratory data analysis
+
+I have selected Titanic dataset that because it is small and contains missing values. I wanted to do exploratory data anaysis such as survival rate, genver versus survival analysis, etc using this dataset.
+
+## Comparing survivor versus non survivors
+
+Source: https://raw.githubusercontent.com/NafeesKhandker/titanic/refs/heads/main/titanic.csv
