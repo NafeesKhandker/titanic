@@ -7,10 +7,12 @@ editor: visual
 
 # Approach
 
-## Exploratory data analysis
+## Analysis Strategy
 
-I have selected Titanic dataset that because it is small and contains missing values. I wanted to do exploratory data anaysis such as survival rate, genver versus survival analysis, etc using this dataset.
+I have selected Titanic dataset that because it is small and contains missing values. I wanted to do exploratory data analysis such as survival rate, gender versus survival analysis, etc using this dataset.
 
-## Comparing survivor versus non survivors
+## Anticipated Data Challenges
+
+One of the main challenges is to handle the missing values in this dataset. It has both categorical and numerical variables. Proper technique should be used to find out the useful features as well as the irrelevant features.
 
 Source: https://raw.githubusercontent.com/NafeesKhandker/titanic/refs/heads/main/titanic.csv
