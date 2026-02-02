@@ -7,12 +7,183 @@ editor: visual
 
 # Approach
 
-## Analysis Strategy
+### Analysis Strategy
 
-I have selected Titanic dataset that because it is small and contains missing values. I wanted to do exploratory data analysis such as survival rate, gender versus survival analysis, etc using this dataset.
+I have selected Titanic dataset because it is small and contains missing values. I wanted to do exploratory data analysis such as survival rate, gender versus survival analysis, etc using this dataset.
 
-## Anticipated Data Challenges
+### Anticipated Data Challenges
 
 One of the main challenges is to handle the missing values in this dataset. It has both categorical and numerical variables. Proper technique should be used to find out the useful features as well as the irrelevant features.
 
 Source: https://raw.githubusercontent.com/NafeesKhandker/titanic/refs/heads/main/titanic.csv
+
+```{r}
+#install.packages("gt")
+```
+
+At first, I am reading the raw CSV data from my github repository and loading it into R as a dataframe df. The glimpse() function has been used to dhow the structure and the variables in the dataset. Finally, the dataset is displayed in a nice table using the gt package.
+
+```{r}
+library(tidyverse)
+library(gt)
+url <- "https://raw.githubusercontent.com/NafeesKhandker/titanic/refs/heads/main/titanic.csv"
+
+df <- read_csv(
+  file = url,
+  show_col_types = FALSE,
+  progress = FALSE
+)
+
+glimpse(df)
+
+df |>
+  gt()
+
+```
+
+## Subset data
+
+In this step, I am creating a subset of the dataset, df_subset that filters only the Passengerid, Age, Sex, Pclass, Fare, sibsp, Parch, Embarked, `2urvived` columns.
+
+```{r}
+df_subset <- df |>
+  select(
+    Passengerid,
+    Age,
+    Sex,
+    Pclass,
+    Fare,
+    sibsp,
+    Parch,
+    Embarked,
+    `2urvived`
+  )
+
+df_subset |>
+  gt()
+```
+
+## Handling the Missing Values
+
+I am dropping the rows when Age and Embarked columns have missing values.
+
+```{r}
+df_subset <- df[
+  !is.na(df$Age) & !is.na(df$Embarked),
+  c(
+    "Passengerid",
+    "Age",
+    "Sex",
+    "Pclass",
+    "Fare",
+    "sibsp",
+    "Parch",
+    "Embarked",
+    "2urvived"
+  )
+]
+
+df_subset |>
+  gt()
+
+```
+
+## EDA: Age Distribution by Survival
+
+I have imported the ggplot2 library to plot an Age distribution by suvival. There are 30 bins have been used. 2urvived (Survived) column have been labeled with Yes/No instead of 1/0. The histogram shows that the passengers who lost life was mostly around age 27/28. Between age 0 - 16, more passengers survived than died. Same goes for passengers between age 22 - 41.
+
+```{r}
+# Load required library
+library(ggplot2)
+
+# Convert '2urvived' to a factor for easier plotting
+df_subset$Survived <- factor(df_subset$`2urvived`, labels = c("No", "Yes"))
+
+# Histogram of Age by Survival
+ggplot(df_subset, aes(x = Age, fill = Survived)) +
+  geom_histogram(alpha = 0.6, position = "identity", bins = 30) +
+  labs(title = "Age Distribution by Survival",
+       x = "Age",
+       y = "Count",
+       fill = "Survived") +
+  theme_minimal()
+
+# Density plot of Age by Survival
+ggplot(df_subset, aes(x = Age, color = Survived, fill = Survived)) +
+  geom_density(alpha = 0.3) +
+  labs(title = "Age Density by Survival",
+       x = "Age",
+       y = "Density",
+       fill = "Survived",
+       color = "Survived") +
+  theme_minimal()
+```
+
+## More EDAs:
+
+### Overall Survival Rate
+
+The overall survival rate is 0.26, meaning that 26 out of 100 survived during the Titanic tragedy.
+
+### Survival Rate by Sex
+
+The survival rate by sex shows that almost 50% males survived where as the percentage for females were 13%.
+
+### Survival Rate by Pclass
+
+When it comes to Pclass, it is seen that the better class passengers have better survival rates. The first class passengers has survival rates of 42%, whereas second and third class passengers have survival rates 31% and 17%, respectively.
+
+### Survival Rate by Embarked
+
+In the cases of Embarked, Cherbourg (0) had the highest suvival rate (0.34), while Queenstown (1) and Southampton (3) had identical survival rate 24%.
+
+```{r}
+# Load required library
+library(dplyr)
+library(ggplot2)
+
+# Convert '2urvived' to factor
+df_subset$Survived <- factor(df_subset$`2urvived`, labels = c("No", "Yes"))
+
+# 1️⃣ Overall survival rate
+overall_survival <- df_subset %>%
+  summarise(Survival_Rate = mean(`2urvived`))
+print(overall_survival)
+
+# 2️⃣ Survival rate by Sex
+survival_by_sex <- df_subset %>%
+  group_by(Sex) %>%
+  summarise(Survival_Rate = mean(`2urvived`))
+print(survival_by_sex)
+
+# 3️⃣ Survival rate by Pclass
+survival_by_pclass <- df_subset %>%
+  group_by(Pclass) %>%
+  summarise(Survival_Rate = mean(`2urvived`))
+print(survival_by_pclass)
+
+# 4️⃣ Survival rate by Embarked
+survival_by_embarked <- df_subset %>%
+  group_by(Embarked) %>%
+  summarise(Survival_Rate = mean(`2urvived`))
+print(survival_by_embarked)
+
+# Optional: Visualize survival by Sex, Pclass, and Embarked
+ggplot(df_subset, aes(x = factor(Sex), fill = Survived)) +
+  geom_bar(position = "fill") +
+  ylab("Proportion") +
+  labs(title = "Survival Rate by Sex", x = "Sex") +
+  theme_minimal()
+
+ggplot(df_subset, aes(x = factor(Pclass), fill = Survived)) +
+  geom_bar(position = "fill") +
+  ylab("Proportion") +
+  labs(title = "Survival Rate by Pclass", x = "Passenger Class") +
+  theme_minimal()
+
+ggplot(df_subset, aes(x = factor(Embarked), fill = Survived)) +
+  geom_bar(position = "fill") +
+  ylab("Proportion") +
+  labs(title = "Survival Rate by Embarked", x = "Port of Embarkation") +
+  theme_minimal()
+```
